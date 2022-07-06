@@ -1,0 +1,41 @@
+---
+title: "deSolve Package:ODE Demostration"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 如何使用deSolve包中ode函数建立传染病模型
+ode函数使用泛函编程的思想
+- syntax: ode(y,
+              times,
+              func,
+              parms)
+- 参数说明：y：常微分方程的初值；times：运行时间； func：你自己写的常微分方程组（泛函编程的体现--ode会调用你的函数）；parms：func里面用到的参数
+- 具体设置方法以及细节
+```{r, echo=TRUE}
+library(deSolve)
+corhort_model = function(time, state, parameters){ #注意，在设置自己的常微分方程时，time， state这两个参数是从ode()里面传递过来的，所以参数名不要改变
+  with(as.list(c(state, parameters)),{
+                  
+                dI = -gamma * I
+                dR = gamma * I
+                return(list(c(dI, dR))) #注意，该函数的返回值需要明确设为list
+          
+  })
+}
+  
+#在调用ode时，会将func的返回值作为下一个y
+ode(
+  y=c(I=1E6, R=0), #y为Named vector
+  times = seq(from = 0, to = 4*7, by = 1),  #vector
+  func = corhort_model,
+  parms = c(gamma=0.1) #Named vector
+)
+
+```
+
+
+
